@@ -1,0 +1,18 @@
+## Tables Hibernate will auto-create
+
+| Table | Columns |
+|---|---|
+| `volunteer_opportunities` | All entity fields |
+| `volunteer_opportunity_skills` | `opportunity_id`, `skill` (one row per skill) |
+
+## API quick reference
+
+| Method | URL | Description |
+|---|---|---|
+| POST | `/api/v1/volunteer-opportunities` | Submit form (your `handleSubmit`) |
+| GET | `/api/v1/volunteer-opportunities/{id}` | Get one |
+| GET | `/api/v1/volunteer-opportunities?category=&location=` | Search active |
+| GET | `/api/v1/volunteer-opportunities/campaign/{id}` | By campaign |
+| PUT | `/api/v1/volunteer-opportunities/{id}` | Update |
+| PATCH | `/api/v1/volunteer-opportunities/{id}/status?status=ACTIVE` | Admin approve |
+| DELETE | `/api/v1/volunteer-opportunities/{id}` | Delete |

@@ -30,7 +30,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // Skip JWT check for public endpoints
         if (path.startsWith("/api/auth/") || path.startsWith("/oauth2/")) {
             filterChain.doFilter(request, response);
             return;
@@ -41,26 +40,38 @@ public class JwtFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
 
-            if (jwtUtil.validateToken(token)
-                    && "access".equals(jwtUtil.extractType(token))) {
+            if (jwtUtil.validateToken(token) && "access".equals(jwtUtil.extractType(token))) {
 
                 String email = jwtUtil.extractEmail(token);
                 List<String> roles = jwtUtil.extractRoles(token);
 
+
                 if (roles != null) {
                     List<SimpleGrantedAuthority> authorities = roles.stream()
-                            .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                            .map(role -> {
+                                String authority = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+                                return new SimpleGrantedAuthority(authority);
+                            })
                             .collect(Collectors.toList());
+
+                    System.out.println("=== Final authorities set on context: " + authorities);
 
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
-                                    email,   // principal — email string, no DB call needed
+                                    email,
                                     null,
                                     authorities
                             );
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                    System.out.println("=== Authentication set successfully for: " + email);
+                } else {
+                    System.out.println("=== WARNING: roles list is null, no authentication set");
                 }
+            } else {
+                System.out.println("=== WARNING: Token invalid or not access type — no authentication set");
             }
+        } else {
+            System.out.println("=== WARNING: No Bearer token found in request");
         }
 
         filterChain.doFilter(request, response);

@@ -40,9 +40,9 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll() // ✅ added /login/oauth2/** for Spring's internal OAuth2 routes
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/organizer/**").hasAnyRole("ADMIN", "ORGANIZER")
+                        .requestMatchers("/oauth2/**", "/api/oauth2/**", "/login/oauth2/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")           // ← was hasRole
+                        .requestMatchers("/api/organizer/**").hasAuthority("ROLE_ORGANIZER")   // ← was hasRole
                         .requestMatchers("/api/user/**").authenticated()
                         .anyRequest().authenticated()
                 )
