@@ -29,7 +29,7 @@ public class VolunteerOpportunityRequest {
     private String description;
 
     @NotBlank(message = "LongDescription is required")
-    @Size(min = 20, message = "LongDescription must be at least 40 characters")
+    @Size(min = 40, message = "LongDescription must be at least 40 characters")
     private String longDescription;
 
     private String linkedCampaignId; // optional
