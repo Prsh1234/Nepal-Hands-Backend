@@ -54,7 +54,6 @@ public class JwtFilter extends OncePerRequestFilter {
                             })
                             .collect(Collectors.toList());
 
-                    System.out.println("=== Final authorities set on context: " + authorities);
 
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
@@ -63,7 +62,6 @@ public class JwtFilter extends OncePerRequestFilter {
                                     authorities
                             );
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-                    System.out.println("=== Authentication set successfully for: " + email);
                 } else {
                     System.out.println("=== WARNING: roles list is null, no authentication set");
                 }

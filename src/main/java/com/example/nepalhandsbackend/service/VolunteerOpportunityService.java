@@ -12,7 +12,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +27,7 @@ public class VolunteerOpportunityService {
 
     private final VolunteerOpportunityRepository repository;
 
-    public VolunteerOpportunityResponse create(VolunteerOpportunityRequest req) {
+    public VolunteerOpportunityResponse create(VolunteerOpportunityRequest req) throws IOException {
         VolunteerOpportunity entity = toEntity(req);
         return toResponse(repository.save(entity));
     }
@@ -47,7 +50,7 @@ public class VolunteerOpportunityService {
         return repository.findByLinkedCampaignId(campaignId, pageable).map(this::toResponse);
     }
 
-    public VolunteerOpportunityResponse update(Long id, VolunteerOpportunityRequest req) {
+    public VolunteerOpportunityResponse update(Long id, VolunteerOpportunityRequest req) throws IOException {
         VolunteerOpportunity existing = findOrThrow(id);
         applyRequest(req, existing);
         return toResponse(repository.save(existing));
@@ -71,13 +74,26 @@ public class VolunteerOpportunityService {
                         "Volunteer opportunity not found: " + id));
     }
 
-    private VolunteerOpportunity toEntity(VolunteerOpportunityRequest req) {
+    private VolunteerOpportunity toEntity(VolunteerOpportunityRequest req) throws IOException {
         VolunteerOpportunity entity = new VolunteerOpportunity();
         applyRequest(req, entity);
         return entity;
     }
 
-    private void applyRequest(VolunteerOpportunityRequest req, VolunteerOpportunity entity) {
+    private void applyRequest(VolunteerOpportunityRequest req, VolunteerOpportunity entity) throws IOException {
+        byte[] coverBytes = null;
+        if (req.getCoverImage() != null && !req.getCoverImage().isEmpty()) {
+            coverBytes = req.getCoverImage().getBytes();
+        }
+
+        List<byte[]> imageBytesList = new ArrayList<>();
+        if (req.getImages() != null) {
+            for (MultipartFile file : req.getImages()) {
+                if (!file.isEmpty()) {
+                    imageBytesList.add(file.getBytes());
+                }
+            }
+        }
         entity.setTitle(req.getTitle());
         entity.setCategory(req.getCategory());
         entity.setLocation(req.getLocation());
@@ -95,6 +111,8 @@ public class VolunteerOpportunityService {
         entity.setStartDate(req.getStartDate());
         entity.setEndDate(req.getEndDate());
         entity.setDailyHours(req.getDailyHours() != null ? req.getDailyHours() : 6);
+        entity.setCoverImage(coverBytes);
+        entity.setImages(imageBytesList);
         entity.setContactName(req.getContactName());
         entity.setContactEmail(req.getContactEmail());
         entity.setContactPhone(req.getContactPhone());
@@ -120,6 +138,8 @@ public class VolunteerOpportunityService {
                 .startDate(e.getStartDate())
                 .endDate(e.getEndDate())
                 .dailyHours(e.getDailyHours())
+                .coverImage(e.getCoverImage())
+                .images(e.getImages())
                 .contactName(e.getContactName())
                 .contactEmail(e.getContactEmail())
                 .contactPhone(e.getContactPhone())

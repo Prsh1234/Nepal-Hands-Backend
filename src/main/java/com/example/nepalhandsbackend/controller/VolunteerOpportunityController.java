@@ -11,10 +11,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 
 @RestController
@@ -25,13 +27,10 @@ public class VolunteerOpportunityController {
     private final VolunteerOpportunityService service;
 
     /** POST /api/organizer/volunteer-opportunities — submit the form */
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<VolunteerOpportunityResponse> create(
-            @Valid @RequestBody VolunteerOpportunityRequest request) {
-        VolunteerOpportunityResponse created = service.create(request);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(created.getId()).toUri();
-        return ResponseEntity.created(location).body(created);
+            @ModelAttribute VolunteerOpportunityRequest request) throws IOException {
+        return ResponseEntity.ok(service.create(request));
     }
 
     /** GET /api/organizer/volunteer-opportunities/{id} */
@@ -62,7 +61,7 @@ public class VolunteerOpportunityController {
     @PutMapping("/{id}")
     public ResponseEntity<VolunteerOpportunityResponse> update(
             @PathVariable Long id,
-            @Valid @RequestBody VolunteerOpportunityRequest request) {
+            @Valid @RequestBody VolunteerOpportunityRequest request) throws IOException {
         return ResponseEntity.ok(service.update(id, request));
     }
 

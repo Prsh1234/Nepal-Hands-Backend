@@ -33,9 +33,15 @@ public class VolunteerOpportunityResponse {
     private LocalDate startDate;
     private LocalDate endDate;
     private Integer dailyHours;
+
+    private byte[] coverImage;
+    private List<byte[]> images;
+
     private String contactName;
     private String contactEmail;
     private String contactPhone;
+
+
 
     private OpportunityStatus status;
     private LocalDateTime createdAt;

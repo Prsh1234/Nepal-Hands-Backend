@@ -2,9 +2,7 @@ package com.example.nepalhandsbackend.service;
 
 import com.example.nepalhandsbackend.dto.request.CampaignRequest;
 import com.example.nepalhandsbackend.dto.response.CampaignResponse;
-import com.example.nepalhandsbackend.dto.response.VolunteerOpportunityResponse;
 import com.example.nepalhandsbackend.model.Campaign;
-import com.example.nepalhandsbackend.model.VolunteerOpportunity;
 import com.example.nepalhandsbackend.repository.CampaignRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -13,14 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +23,7 @@ public class CampaignService {
     private final CampaignRepository campaignRepository;
 
     public Campaign createCampaign(CampaignRequest request) throws IOException {
-
+        System.out.println("1");
         byte[] coverBytes = null;
         if (request.getCoverImage() != null && !request.getCoverImage().isEmpty()) {
             coverBytes = request.getCoverImage().getBytes();
@@ -44,7 +37,7 @@ public class CampaignService {
                 }
             }
         }
-
+        System.out.println("2");
         Campaign campaign = Campaign.builder()
                 .title(request.getTitle())
                 .category(request.getCategory())
@@ -63,7 +56,7 @@ public class CampaignService {
                 .coverImage(coverBytes)
                 .images(imageBytesList)
                 .build();
-
+        System.out.println("3");
         return campaignRepository.save(campaign);
     }
     @Transactional(readOnly = true)

@@ -122,6 +122,19 @@ public class VolunteerOpportunity {
     @Column
     private String contactPhone;
 
+    // media
+
+    @Lob
+    @Column(name = "cover_image", columnDefinition = "LONGBLOB")
+    private byte[] coverImage;
+
+    // ✅ multiple images
+    @ElementCollection
+    @CollectionTable(name = "volunteer_opportunity_images", joinColumns = @JoinColumn(name = "opportunity_id"))
+    @Column(name = "image", columnDefinition = "LONGBLOB")
+    private List<byte[]> images;
+
+
     // ── Metadata ─────────────────────────────────────────────────────────────
 
     @Enumerated(EnumType.STRING)

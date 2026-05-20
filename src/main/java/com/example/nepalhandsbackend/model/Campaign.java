@@ -94,7 +94,7 @@ public class Campaign {
     @Column
     private String contactPhone;
 
-    // ── Media (stored as URLs/paths, NOT File objects) ────────────
+    // ── Media
 
     @Lob
     @Column(name = "cover_image", columnDefinition = "LONGBLOB")

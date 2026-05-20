@@ -2,6 +2,7 @@ package com.example.nepalhandsbackend.dto.request;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -77,6 +78,10 @@ public class VolunteerOpportunityRequest {
     @Min(value = 1)
     @Max(value = 24)
     private Integer dailyHours = 6;
+
+
+    private MultipartFile coverImage;
+    private List<MultipartFile> images;
 
     @NotBlank(message = "Contact name is required")
     private String contactName;
