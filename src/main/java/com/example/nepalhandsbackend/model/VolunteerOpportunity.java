@@ -134,7 +134,13 @@ public class VolunteerOpportunity {
     @Column(name = "image", columnDefinition = "LONGBLOB")
     private List<byte[]> images;
 
-
+    // verification
+    @OneToOne(
+            mappedBy = "opportunity",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private VolunteerOpportunityVerification verification;
     // ── Metadata ─────────────────────────────────────────────────────────────
 
     @Enumerated(EnumType.STRING)
@@ -148,4 +154,8 @@ public class VolunteerOpportunity {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }

@@ -91,4 +91,49 @@ public class VolunteerOpportunityRequest {
     private String contactEmail;
 
     private String contactPhone;
+
+
+    // verification
+
+    @NotBlank(message = "Organization legal name is required")
+    private String orgLegalName;
+
+    @NotBlank(message = "Organization type is required")
+    private String orgType;
+
+    @NotBlank(message = "Organization address is required")
+    private String orgAddress;
+
+    @NotBlank(message = "Registration number is required")
+    private String regNumber;
+
+    @NotBlank(message = "Registering authority is required")
+    private String regAuthority;
+
+    private LocalDate regDate;
+
+    @NotBlank(message = "PAN number is required")
+    private String panNumber;
+
+    private String website;
+
+    @NotBlank(message = "Official email is required")
+    @Email
+    private String officialEmail;
+
+    @NotBlank(message = "Official phone is required")
+    private String officialPhone;
+
+    @NotBlank(message = "Authorized signatory is required")
+    private String authorizedSignatory;
+
+    @NotBlank(message = "Designation is required")
+    private String signatoryRole;
+
+
+    // uploaded documents
+    private List<MultipartFile> documents;
+
+    // registration, swc, citizenship, pan...
+    private List<String> documentTypes;
 }

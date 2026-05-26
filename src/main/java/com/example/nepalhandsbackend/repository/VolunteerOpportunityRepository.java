@@ -32,4 +32,14 @@ public interface VolunteerOpportunityRepository extends JpaRepository<VolunteerO
             @Param("location") String location,
             Pageable pageable
     );
+
+    @Query("""
+        SELECT v FROM VolunteerOpportunity v
+        WHERE v.status = :status
+      
+        """)
+    Page<VolunteerOpportunity> opportunityRequest(
+            @Param("status")   OpportunityStatus status,
+            Pageable pageable
+    );
 }

@@ -13,6 +13,8 @@ import java.util.List;
 public class VolunteerOpportunityResponse {
 
     private Long id;
+    private Integer postedById;
+    private String postedByName;
     private String title;
     private String category;
     private String location;
@@ -46,4 +48,7 @@ public class VolunteerOpportunityResponse {
     private OpportunityStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+
+    private VolunteerOpportunityVerificationResponse verification;
 }

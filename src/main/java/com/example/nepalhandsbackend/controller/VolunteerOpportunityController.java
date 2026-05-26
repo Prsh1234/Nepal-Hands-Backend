@@ -2,11 +2,16 @@ package com.example.nepalhandsbackend.controller;
 
 
 import com.example.nepalhandsbackend.dto.request.VolunteerOpportunityRequest;
+import com.example.nepalhandsbackend.dto.response.PageResponse;
 import com.example.nepalhandsbackend.dto.response.VolunteerOpportunityResponse;
+import com.example.nepalhandsbackend.repository.UserRepository;
 import com.example.nepalhandsbackend.service.VolunteerOpportunityService;
 import com.example.nepalhandsbackend.states.OpportunityStatus;
+import com.example.nepalhandsbackend.utils.JwtFilter;
+import com.example.nepalhandsbackend.utils.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,12 +30,23 @@ import java.net.URI;
 public class VolunteerOpportunityController {
 
     private final VolunteerOpportunityService service;
+    private final JwtUtil jwtUtil;
+    @Autowired
+    private UserRepository userRepository;
 
     /** POST /api/organizer/volunteer-opportunities — submit the form */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<VolunteerOpportunityResponse> create(
-            @ModelAttribute VolunteerOpportunityRequest request) throws IOException {
-        return ResponseEntity.ok(service.create(request));
+            @ModelAttribute VolunteerOpportunityRequest request,
+            @RequestHeader("Authorization") String authHeader) throws IOException {
+        String token = authHeader.substring(7); // remove "Bearer "
+
+        String email = jwtUtil.extractEmail(token);
+
+        Integer userId = userRepository.findByEmail(email)
+                .orElseThrow()
+                .getId();
+        return ResponseEntity.ok(service.create(request,userId));
     }
 
     /** GET /api/organizer/volunteer-opportunities/{id} */
@@ -41,11 +57,12 @@ public class VolunteerOpportunityController {
 
     /** GET /api/organizer/volunteer-opportunities?category=teaching&location=Gorkha&page=0&size=10 */
     @GetMapping
-    public ResponseEntity<Page<VolunteerOpportunityResponse>> search(
+    public ResponseEntity<PageResponse<VolunteerOpportunityResponse>> search(
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String location,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable) {
+
         return ResponseEntity.ok(service.search(category, location, pageable));
     }
 

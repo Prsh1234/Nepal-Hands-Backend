@@ -4,40 +4,24 @@ import com.example.nepalhandsbackend.dto.request.CampaignRequest;
 import com.example.nepalhandsbackend.dto.response.CampaignResponse;
 import com.example.nepalhandsbackend.model.Campaign;
 import com.example.nepalhandsbackend.repository.CampaignRepository;
+import com.example.nepalhandsbackend.utils.FileTextUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CampaignService {
-
+    @Autowired
+    private FileTextUtils fileTextUtils;
     private final CampaignRepository campaignRepository;
 
     public Campaign createCampaign(CampaignRequest request) throws IOException {
-        System.out.println("1");
-        byte[] coverBytes = null;
-        if (request.getCoverImage() != null && !request.getCoverImage().isEmpty()) {
-            coverBytes = request.getCoverImage().getBytes();
-        }
 
-        List<byte[]> imageBytesList = new ArrayList<>();
-        if (request.getImages() != null) {
-            for (MultipartFile file : request.getImages()) {
-                if (!file.isEmpty()) {
-                    imageBytesList.add(file.getBytes());
-                }
-            }
-        }
-        System.out.println("2");
         Campaign campaign = Campaign.builder()
                 .title(request.getTitle())
                 .category(request.getCategory())
@@ -53,10 +37,9 @@ public class CampaignService {
                 .contactName(request.getContactName())
                 .contactEmail(request.getContactEmail())
                 .contactPhone(request.getContactPhone())
-                .coverImage(coverBytes)
-                .images(imageBytesList)
+                .coverImage(fileTextUtils.toBytes(request.getCoverImage()))
+                .images(fileTextUtils.toBytesList(request.getImages()))
                 .build();
-        System.out.println("3");
         return campaignRepository.save(campaign);
     }
     @Transactional(readOnly = true)
@@ -79,7 +62,7 @@ public class CampaignService {
                 .location(e.getLocation())
                 .description(e.getDescription())
                 .longDescription(e.getLongDescription())
-                .projectScope(splitLines(e.getProjectScope()))
+                .projectScope(fileTextUtils.splitLines(e.getProjectScope()))
                 .goal(e.getGoal())
                 .duration(e.getDuration())
                 .organizer(e.getOrganizer())
@@ -96,11 +79,4 @@ public class CampaignService {
                 .build();
     }
 
-    private List<String> splitLines(String text) {
-        if (text == null || text.isBlank()) return List.of();
-        return Arrays.stream(text.split("\n"))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toList());
-    }
 }
