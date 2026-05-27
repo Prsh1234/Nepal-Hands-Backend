@@ -3,7 +3,6 @@ package com.example.nepalhandsbackend.dto.response;
 import com.example.nepalhandsbackend.states.CampaignStatus;
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,6 +12,8 @@ import java.util.List;
 @Builder
 public class CampaignResponse {
     private Long id;
+    private Integer postedById;
+    private String postedByName;
     private String title;
     private String category;
     private String location;
@@ -38,5 +39,7 @@ public class CampaignResponse {
     private CampaignStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private CampaignVerificationResponse verification;
 
 }

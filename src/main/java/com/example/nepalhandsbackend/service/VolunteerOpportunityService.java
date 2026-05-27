@@ -258,14 +258,7 @@ public class VolunteerOpportunityService {
                 )
                 .build();
     }
-    private VolunteerVerificationDocumentResponse mapDocument(
-            VolunteerVerificationDocument d
-    ) {
-        return VolunteerVerificationDocumentResponse.builder()
-                .documentType(d.getDocumentType())
-                .file(d.getFile())
-                .build();
-    }
+
     private VolunteerOpportunityResponse toResponse(VolunteerOpportunity e) {
         return VolunteerOpportunityResponse.builder()
                 .id(e.getId())

@@ -58,4 +58,47 @@ public class CampaignRequest {
 
     private MultipartFile coverImage;
     private List<MultipartFile> images;
+
+    // verification
+
+    @NotBlank(message = "Organization legal name is required")
+    private String orgLegalName;
+
+    @NotBlank(message = "Organization type is required")
+    private String orgType;
+
+    @NotBlank(message = "Registration number is required")
+    private String regNumber;
+
+    @NotBlank(message = "Registering authority is required")
+    private String regAuthority;
+
+    private LocalDate regDate;
+
+    @NotBlank(message = "PAN number is required")
+    private String panNumber;
+
+    private String website;
+
+    @NotBlank(message = "Bank name is required")
+    private String bankName;
+
+    @NotBlank(message = "Bank Account Holder Name is required")
+    private String bankAccountHolderName;
+
+    @NotBlank(message = "Bank Account Number is required")
+    private String bankAccountNumber;
+
+    @NotBlank(message = "Authorized signatory is required")
+    private String authorizedSignatory;
+
+    @NotBlank(message = "Designation is required")
+    private String signatoryRole;
+
+
+    // uploaded documents
+    private List<MultipartFile> documents;
+
+    // registration, swc, citizenship, pan...
+    private List<String> documentTypes;
 }

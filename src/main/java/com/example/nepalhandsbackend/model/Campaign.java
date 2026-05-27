@@ -106,6 +106,14 @@ public class Campaign {
     @Column(name = "image", columnDefinition = "LONGBLOB")
     private List<byte[]> images;
 
+
+    // verification
+    @OneToOne(
+            mappedBy = "campaign",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private CampaignVerification verification;
     // ── Metadata ──────────────────────────────────────────────────
 
     @Enumerated(EnumType.STRING)
@@ -119,4 +127,8 @@ public class Campaign {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }
