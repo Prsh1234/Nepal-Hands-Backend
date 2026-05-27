@@ -13,6 +13,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Kyc kyc;
     @Column(unique = true, nullable = false)
     private String email;
 
