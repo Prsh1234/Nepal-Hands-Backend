@@ -41,5 +41,6 @@ public class CampaignResponse {
     private LocalDateTime updatedAt;
 
     private CampaignVerificationResponse verification;
+    private List<CampaignUpdateResponse> updates;
 
 }

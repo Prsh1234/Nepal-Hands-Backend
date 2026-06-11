@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface CampaignRepository extends JpaRepository<Campaign, Long> {
     @Query("""
@@ -22,4 +24,7 @@ public interface CampaignRepository extends JpaRepository<Campaign, Long> {
             @Param("status") CampaignStatus status,
             Pageable pageable
     );
+
+    List<Campaign> findByUserId(Integer userId);
+
 }

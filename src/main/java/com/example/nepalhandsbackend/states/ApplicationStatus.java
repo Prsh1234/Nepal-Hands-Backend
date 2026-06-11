@@ -1,8 +1,9 @@
 package com.example.nepalhandsbackend.states;
 
-public enum KycStatus {
+public enum ApplicationStatus {
+    NOT_APPLIED,
     PENDING,
     APPROVED,
     REJECTED,
-    NOT_APPLIED
+    WITHDRAWN
 }

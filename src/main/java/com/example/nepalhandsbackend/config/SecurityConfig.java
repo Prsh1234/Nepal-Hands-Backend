@@ -1,5 +1,6 @@
 package com.example.nepalhandsbackend.config;
 
+import com.example.nepalhandsbackend.utils.CustomOAuth2FailureHandler;
 import com.example.nepalhandsbackend.utils.CustomOAuth2SuccessHandler;
 import com.example.nepalhandsbackend.utils.JwtFilter;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +21,8 @@ public class SecurityConfig {
 
     @Autowired
     private CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
-
+    @Autowired
+    private CustomOAuth2FailureHandler customOAuth2FailureHandler;
     @Autowired
     private JwtFilter jwtFilter;
 
@@ -64,6 +66,7 @@ public class SecurityConfig {
 
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(customOAuth2SuccessHandler)
+                        .failureHandler(customOAuth2FailureHandler)
                 )
 
                 .httpBasic(httpBasic -> httpBasic.disable())

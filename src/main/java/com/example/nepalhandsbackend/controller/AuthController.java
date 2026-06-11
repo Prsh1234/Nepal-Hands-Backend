@@ -143,12 +143,13 @@ public class AuthController {
     // ─── Helper ───────────────────────────────────────────────────────────────
 
     private UserResponse toUserResponse(User user) {
-        return new UserResponse(
-                user.getId(),
-                user.getEmail(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getRoles()
-        );
+        return UserResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .roles(user.getRoles())
+                .profilePic(user.getProfilePic())
+                .build();
     }
 }

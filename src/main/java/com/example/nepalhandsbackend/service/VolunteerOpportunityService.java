@@ -2,10 +2,7 @@ package com.example.nepalhandsbackend.service;
 
 
 import com.example.nepalhandsbackend.dto.request.VolunteerOpportunityRequest;
-import com.example.nepalhandsbackend.dto.response.PageResponse;
-import com.example.nepalhandsbackend.dto.response.VolunteerOpportunityResponse;
-import com.example.nepalhandsbackend.dto.response.VolunteerOpportunityVerificationResponse;
-import com.example.nepalhandsbackend.dto.response.VolunteerVerificationDocumentResponse;
+import com.example.nepalhandsbackend.dto.response.*;
 import com.example.nepalhandsbackend.model.User;
 import com.example.nepalhandsbackend.model.VolunteerOpportunity;
 import com.example.nepalhandsbackend.model.VolunteerOpportunityVerification;
@@ -37,7 +34,7 @@ public class VolunteerOpportunityService {
     private final VolunteerOpportunityRepository repository;
     @Autowired
     private UserRepository userRepository;
-    public VolunteerOpportunityResponse create(
+    public Long create(
             VolunteerOpportunityRequest req,
             Integer userId
     ) throws IOException {
@@ -48,8 +45,8 @@ public class VolunteerOpportunityService {
         VolunteerOpportunity entity = toEntity(req);
 
         entity.setUser(user);
-
-        return toResponse(repository.save(entity));
+        VolunteerOpportunity created = repository.save(entity);
+        return (created.getId());
     }
 
     @Transactional(readOnly = true)
@@ -91,10 +88,7 @@ public class VolunteerOpportunityService {
         );
     }
 
-    @Transactional(readOnly = true)
-    public Page<VolunteerOpportunityResponse> getByCampaign(String campaignId, Pageable pageable) {
-        return repository.findByLinkedCampaignId(campaignId, pageable).map(this::toResponse);
-    }
+
 
     public VolunteerOpportunityResponse update(Long id, VolunteerOpportunityRequest req) throws IOException {
         VolunteerOpportunity existing = findOrThrow(id);
@@ -137,7 +131,6 @@ public class VolunteerOpportunityService {
         entity.setLocation(req.getLocation());
         entity.setDescription(req.getDescription());
         entity.setLongDescription(req.getLongDescription());
-        entity.setLinkedCampaignId(req.getLinkedCampaignId());
         entity.setRequiredSkills(req.getRequiredSkills());
         entity.setVolunteerSpots(req.getVolunteerSpots());
         entity.setMinimumAge(req.getMinimumAge() != null ? req.getMinimumAge() : 18);
@@ -267,7 +260,6 @@ public class VolunteerOpportunityService {
                 .location(e.getLocation())
                 .description(e.getDescription())
                 .longDescription(e.getLongDescription())
-                .linkedCampaignId(e.getLinkedCampaignId())
                 .requiredSkills(e.getRequiredSkills())
                 .volunteerSpots(e.getVolunteerSpots())
                 .minimumAge(e.getMinimumAge())
@@ -295,6 +287,17 @@ public class VolunteerOpportunityService {
                         e.getUser() != null
                                 ? e.getUser().getFirstName() + " " + e.getUser().getLastName()
                                 : null
+                )
+                .updates(
+                        e.getUpdates() == null ? List.of() :
+                                e.getUpdates().stream().map(u ->
+                                        VolunteerOpportunityUpdateResponse.builder()
+                                                .id(u.getId())
+                                                .title(u.getTitle())
+                                                .body(u.getBody())
+                                                .date(u.getCreatedAt())
+                                                .build()
+                                ).toList()
                 )
                 .build();
     }

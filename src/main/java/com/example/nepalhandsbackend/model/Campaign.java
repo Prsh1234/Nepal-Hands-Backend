@@ -114,6 +114,9 @@ public class Campaign {
             orphanRemoval = true
     )
     private CampaignVerification verification;
+
+    @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CampaignUpdate> updates = new ArrayList<>();
     // ── Metadata ──────────────────────────────────────────────────
 
     @Enumerated(EnumType.STRING)

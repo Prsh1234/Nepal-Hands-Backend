@@ -1,38 +1,28 @@
 package com.example.nepalhandsbackend.dto.response;
 
+import com.example.nepalhandsbackend.states.KycStatus;
 import com.example.nepalhandsbackend.states.Role;
+import lombok.Builder;
+import lombok.Data;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
+@Data
+@Builder
 public class UserResponse {
     private int id;
     private String email;
     private String firstName;
     private String lastName;
     private Set<Role> roles;
+    private String bio;
+    private String location;
+    private byte[] profilePic;
+    private List<String> skills;
+    private List<String> causes;
+    private KycStatus kycStatus;
+    private LocalDateTime joinedAt;
 
-    public UserResponse() {}
-
-    public UserResponse(int id, String email, String firstName, String lastName, Set<Role> roles) {
-        this.id = id;
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.roles = roles;
-    }
-
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getFirstName() { return firstName; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
-
-    public String getLastName() { return lastName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
-
-    public Set<Role> getRoles() { return roles; }
-    public void setRoles(Set<Role> roles) { this.roles = roles; }
 }

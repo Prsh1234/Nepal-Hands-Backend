@@ -33,8 +33,6 @@ public class VolunteerOpportunityRequest {
     @Size(min = 40, message = "LongDescription must be at least 40 characters")
     private String longDescription;
 
-    private String linkedCampaignId; // optional
-
     // Step 1 – Requirements
     @NotEmpty(message = "At least one skill is required")
     private List<String> requiredSkills;

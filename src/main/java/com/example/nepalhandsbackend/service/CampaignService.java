@@ -197,6 +197,17 @@ public class CampaignService {
                                 ? e.getUser().getFirstName() + " " + e.getUser().getLastName()
                                 : null
                 )
+                .updates(
+                        e.getUpdates() == null ? List.of() :
+                                e.getUpdates().stream().map(u ->
+                                        CampaignUpdateResponse.builder()
+                                                .id(u.getId())
+                                                .title(u.getTitle())
+                                                .body(u.getBody())
+                                                .date(u.getCreatedAt())
+                                                .build()
+                                ).toList()
+                )
                 .build();
     }
 

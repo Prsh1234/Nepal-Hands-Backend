@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ import java.net.URI;
 @RequestMapping("/api/organizer/volunteer-opportunities")
 @RequiredArgsConstructor
 public class VolunteerOpportunityController {
-
+    public record CreateVolunteerResponse(Long id) {}
     private final VolunteerOpportunityService service;
     private final JwtUtil jwtUtil;
     @Autowired
@@ -36,7 +37,7 @@ public class VolunteerOpportunityController {
 
     /** POST /api/organizer/volunteer-opportunities — submit the form */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<VolunteerOpportunityResponse> create(
+    public ResponseEntity<CreateVolunteerResponse> create(
             @ModelAttribute VolunteerOpportunityRequest request,
             @RequestHeader("Authorization") String authHeader) throws IOException {
         String token = authHeader.substring(7); // remove "Bearer "
@@ -46,7 +47,8 @@ public class VolunteerOpportunityController {
         Integer userId = userRepository.findByEmail(email)
                 .orElseThrow()
                 .getId();
-        return ResponseEntity.ok(service.create(request,userId));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new CreateVolunteerResponse(service.create(request,userId)));
     }
 
     /** GET /api/organizer/volunteer-opportunities/{id} */
@@ -66,13 +68,6 @@ public class VolunteerOpportunityController {
         return ResponseEntity.ok(service.search(category, location, pageable));
     }
 
-    /** GET /api/organizer/volunteer-opportunities/campaign/{campaignId} */
-    @GetMapping("/campaign/{campaignId}")
-    public ResponseEntity<Page<VolunteerOpportunityResponse>> getByCampaign(
-            @PathVariable String campaignId,
-            @PageableDefault(size = 10) Pageable pageable) {
-        return ResponseEntity.ok(service.getByCampaign(campaignId, pageable));
-    }
 
     /** PUT /api/organizer/volunteer-opportunities/{id} */
     @PutMapping("/{id}")

@@ -1,5 +1,6 @@
 package com.example.nepalhandsbackend.dto.response;
 
+import com.example.nepalhandsbackend.model.VolunteerOpportunityUpdate;
 import com.example.nepalhandsbackend.states.OpportunityStatus;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +21,6 @@ public class VolunteerOpportunityResponse {
     private String location;
     private String description;
     private String longDescription;
-    private String linkedCampaignId;
 
     private List<String> requiredSkills;
     private Integer volunteerSpots;
@@ -51,4 +51,5 @@ public class VolunteerOpportunityResponse {
 
 
     private VolunteerOpportunityVerificationResponse verification;
+    private List<VolunteerOpportunityUpdateResponse> updates;
 }

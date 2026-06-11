@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface VolunteerOpportunityRepository extends JpaRepository<VolunteerOpportunity, Long> {
 
@@ -18,7 +20,7 @@ public interface VolunteerOpportunityRepository extends JpaRepository<VolunteerO
             String category, OpportunityStatus status, Pageable pageable
     );
 
-    Page<VolunteerOpportunity> findByLinkedCampaignId(String campaignId, Pageable pageable);
+
 
     @Query("""
         SELECT v FROM VolunteerOpportunity v
@@ -42,4 +44,6 @@ public interface VolunteerOpportunityRepository extends JpaRepository<VolunteerO
             @Param("status")   OpportunityStatus status,
             Pageable pageable
     );
+
+    List<VolunteerOpportunity> findByUserId(Integer userId);
 }

@@ -14,6 +14,7 @@ import com.example.nepalhandsbackend.service.VolunteerOpportunityService;
 import com.example.nepalhandsbackend.states.CampaignStatus;
 import com.example.nepalhandsbackend.states.KycStatus;
 import com.example.nepalhandsbackend.states.OpportunityStatus;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
+@Transactional
 public class AdminController {
     private final VolunteerOpportunityService volunteerService;
     private final CampaignService campaignService;
@@ -66,7 +68,12 @@ public class AdminController {
             @RequestParam OpportunityStatus status) {
         return ResponseEntity.ok(volunteerService.updateStatus(id, status));
     }
-
+    @Transactional
+    @DeleteMapping("/volunteer-opportunities/delete/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        volunteerService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
     @GetMapping("/campaign")
     public ResponseEntity<PageResponse<CampaignResponse>> searchCampaigns(
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)

@@ -1,8 +1,10 @@
 package com.example.nepalhandsbackend.utils;
 
+import com.example.nepalhandsbackend.repository.UserRepository;
 import com.example.nepalhandsbackend.states.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -20,7 +22,8 @@ public class JwtUtil {
     private final long REFRESH_TOKEN_EXP = 1000L * 60 * 60 * 24 * 30; // 30 days
 
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
-
+    @Autowired
+    private UserRepository userRepository;
     // ─── Token Generation ─────────────────────────────────────────────────────
 
     public String generateAccessToken(String email, Set<Role> roles) {
@@ -54,6 +57,14 @@ public class JwtUtil {
         return getClaims(token).getSubject();
     }
 
+    public Integer extractUserId(String token) {
+        String email = extractEmail(token);
+
+        Integer userId = userRepository.findByEmail(email)
+                .orElseThrow()
+                .getId();
+        return userId;
+    }
     public String extractType(String token) {
         return getClaims(token).get("type", String.class);
     }

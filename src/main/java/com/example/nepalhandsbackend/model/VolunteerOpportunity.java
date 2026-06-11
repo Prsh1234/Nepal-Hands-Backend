@@ -49,8 +49,6 @@ public class VolunteerOpportunity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String longDescription;
 
-    @Column(name = "linked_campaign_id")
-    private String linkedCampaignId;
 
     // ── Step 1: Requirements ─────────────────────────────────────────────────
 
@@ -141,6 +139,17 @@ public class VolunteerOpportunity {
             orphanRemoval = true
     )
     private VolunteerOpportunityVerification verification;
+
+    @OneToMany(mappedBy = "opportunity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VolunteerOpportunityUpdate> updates = new ArrayList<>();
+
+
+    @OneToMany(
+            mappedBy = "opportunity",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<VolunteerApplication> applications = new ArrayList<>();
     // ── Metadata ─────────────────────────────────────────────────────────────
 
     @Enumerated(EnumType.STRING)
