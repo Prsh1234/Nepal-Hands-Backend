@@ -67,6 +67,10 @@ public class User {
     @Column(name = "cause")
     @Builder.Default
     private List<String> causes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<CampaignPayment> payments;
+
     @CreationTimestamp
     private LocalDateTime joinedAt;
     @CreationTimestamp

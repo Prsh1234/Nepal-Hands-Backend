@@ -117,6 +117,9 @@ public class Campaign {
 
     @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CampaignUpdate> updates = new ArrayList<>();
+
+    @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL)
+    private List<CampaignPayment> payments;
     // ── Metadata ──────────────────────────────────────────────────
 
     @Enumerated(EnumType.STRING)
