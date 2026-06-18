@@ -1,26 +1,33 @@
 package com.example.nepalhandsbackend.service;
 
+import com.example.nepalhandsbackend.dto.request.CampaignTransparencyExpensesRequest;
 import com.example.nepalhandsbackend.dto.request.CreateUpdateRequest;
 import com.example.nepalhandsbackend.dto.response.CampaignUpdateResponse;
 import com.example.nepalhandsbackend.model.Campaign;
+import com.example.nepalhandsbackend.model.CampaignTransparencyExpenses;
 import com.example.nepalhandsbackend.model.CampaignUpdate;
 import com.example.nepalhandsbackend.repository.CampaignRepository;
+import com.example.nepalhandsbackend.repository.CampaignTransparencyExpensesRepository;
 import com.example.nepalhandsbackend.repository.CampaignUpdateRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class CampaignUpdateService {
 
-    private final CampaignUpdateRepository campaignUpdateRepository;
-    private final CampaignRepository campaignRepository;
+    @Autowired
+    private CampaignUpdateRepository campaignUpdateRepository;
+    @Autowired
+    private CampaignRepository campaignRepository;
 
     public void createUpdate(Integer userId, CreateUpdateRequest req) {
 
@@ -84,4 +91,6 @@ public class CampaignUpdateService {
                         .build()
         );
     }
+
+
 }

@@ -3,9 +3,11 @@ package com.example.nepalhandsbackend.service;
 import com.example.nepalhandsbackend.dto.request.CampaignRequest;
 import com.example.nepalhandsbackend.dto.response.*;
 import com.example.nepalhandsbackend.model.*;
+import com.example.nepalhandsbackend.repository.CampaignPaymentRepository;
 import com.example.nepalhandsbackend.repository.CampaignRepository;
 import com.example.nepalhandsbackend.repository.UserRepository;
 import com.example.nepalhandsbackend.states.CampaignStatus;
+import com.example.nepalhandsbackend.states.PaymentStatus;
 import com.example.nepalhandsbackend.utils.FileTextUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,8 @@ public class CampaignService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CampaignPaymentRepository campaignPaymentRepository;
     @Transactional
     public Campaign createCampaign(CampaignRequest request,Integer userId) throws IOException {
         User user = userRepository.findById(userId)
@@ -102,12 +106,38 @@ public class CampaignService {
         return toResponse(findOrThrow(id));
     }
 
+    private List<DonorResponse> getRecentDonations(Long campaignId){
+        List<CampaignPayment> donations =
+                campaignPaymentRepository
+                        .findTop5ByCampaignIdAndStatusOrderByCreatedAtDesc(
+                                campaignId,
+                                PaymentStatus.SUCCESS
+                        );
+
+        return donations.stream()
+                .map(payment -> DonorResponse.builder()
+                        .donorName(
+                                payment.isAnonymous()
+                                        ? "Anonymous Donor"
+                                        : payment.getUser().getFirstName() + " " + payment.getUser().getLastName()
+                        )
+                        .amount(payment.getAmount())
+                        .donatedAt(payment.getCreatedAt())
+                        .donorId(
+                                payment.isAnonymous()
+                                        ?null
+                                        :payment.getUser().getId())
+                        .build())
+                .toList();
+    }
 
     private Campaign findOrThrow(Long id) {
         return campaignRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Campaign not found: " + id));
     }
+
+
     @Transactional(readOnly = true)
     public PageResponse<CampaignResponse> campaignRequests(
             Pageable pageable) {
@@ -133,6 +163,7 @@ public class CampaignService {
 
         return toResponse(entity);
     }
+
 
     private CampaignVerificationResponse mapVerification(
             CampaignVerification c
@@ -176,6 +207,8 @@ public class CampaignService {
                 .longDescription(e.getLongDescription())
                 .projectScope(fileTextUtils.splitLines(e.getProjectScope()))
                 .goal(e.getGoal())
+                .totalDonors(campaignPaymentRepository.countByCampaignIdAndStatus(e.getId(),PaymentStatus.SUCCESS))
+                .raised(campaignPaymentRepository.getTotalRaisedByCampaignId(e.getId()))
                 .duration(e.getDuration())
                 .organizer(e.getOrganizer())
                 .startDate(e.getStartDate())
@@ -207,6 +240,9 @@ public class CampaignService {
                                                 .date(u.getCreatedAt())
                                                 .build()
                                 ).toList()
+                )
+                .recentDonors(
+                        getRecentDonations(e.getId())
                 )
                 .build();
     }

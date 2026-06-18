@@ -46,8 +46,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")           // ← was hasRole
                         .requestMatchers("/api/organizer/**").hasAnyAuthority("ROLE_ORGANIZER", "ROLE_ADMIN")
                         .requestMatchers("/api/user/**").authenticated()
-                        .requestMatchers("/api/payment/**").permitAll()
-                        .requestMatchers("/api/payments/**").permitAll()
+                        .requestMatchers("/api/esewa/**").permitAll()
+                        .requestMatchers("/api/payment/**").authenticated()
 
 
                         .anyRequest().authenticated()

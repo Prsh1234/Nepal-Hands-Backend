@@ -120,6 +120,8 @@ public class Campaign {
 
     @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL)
     private List<CampaignPayment> payments;
+    @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL)
+    private List<CampaignTransparencyExpenses> expenses;
     // ── Metadata ──────────────────────────────────────────────────
 
     @Enumerated(EnumType.STRING)

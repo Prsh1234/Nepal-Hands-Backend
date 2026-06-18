@@ -22,6 +22,8 @@ public class CampaignResponse {
     private List<String> projectScope;
 
     private Long goal;
+    private Double raised;
+    private Long totalDonors;
     private String duration;
     private String organizer;
 
@@ -42,5 +44,6 @@ public class CampaignResponse {
 
     private CampaignVerificationResponse verification;
     private List<CampaignUpdateResponse> updates;
+    private List<DonorResponse> recentDonors;
 
 }
