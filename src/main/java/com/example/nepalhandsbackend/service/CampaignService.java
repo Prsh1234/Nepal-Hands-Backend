@@ -33,6 +33,9 @@ public class CampaignService {
 
     @Autowired
     private CampaignPaymentRepository campaignPaymentRepository;
+
+    @Autowired
+    private DonationService donationService;
     @Transactional
     public Campaign createCampaign(CampaignRequest request,Integer userId) throws IOException {
         User user = userRepository.findById(userId)
@@ -106,30 +109,7 @@ public class CampaignService {
         return toResponse(findOrThrow(id));
     }
 
-    private List<DonorResponse> getRecentDonations(Long campaignId){
-        List<CampaignPayment> donations =
-                campaignPaymentRepository
-                        .findTop5ByCampaignIdAndStatusOrderByCreatedAtDesc(
-                                campaignId,
-                                PaymentStatus.SUCCESS
-                        );
 
-        return donations.stream()
-                .map(payment -> DonorResponse.builder()
-                        .donorName(
-                                payment.isAnonymous()
-                                        ? "Anonymous Donor"
-                                        : payment.getUser().getFirstName() + " " + payment.getUser().getLastName()
-                        )
-                        .amount(payment.getAmount())
-                        .donatedAt(payment.getCreatedAt())
-                        .donorId(
-                                payment.isAnonymous()
-                                        ?null
-                                        :payment.getUser().getId())
-                        .build())
-                .toList();
-    }
 
     private Campaign findOrThrow(Long id) {
         return campaignRepository.findById(id)
@@ -242,7 +222,7 @@ public class CampaignService {
                                 ).toList()
                 )
                 .recentDonors(
-                        getRecentDonations(e.getId())
+                        donationService.getRecentDonations(e.getId())
                 )
                 .build();
     }

@@ -15,9 +15,9 @@ public class OrganizerCampaignResponse {
     private String status;
 
     private Long goal;
-    private Long raised;
+    private Double raised;
 
-    private Integer donors;
+    private Long donors;
     private Long daysLeft;
 
     private LocalDateTime createdDate;

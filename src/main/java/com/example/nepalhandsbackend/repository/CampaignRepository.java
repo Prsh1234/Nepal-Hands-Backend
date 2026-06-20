@@ -26,5 +26,6 @@ public interface CampaignRepository extends JpaRepository<Campaign, Long> {
     );
 
     List<Campaign> findByUserId(Integer userId);
+    Page<Campaign> findByUserId(Integer userId, Pageable pageable);
 
 }

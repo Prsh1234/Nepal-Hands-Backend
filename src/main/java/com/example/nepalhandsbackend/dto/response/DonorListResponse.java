@@ -9,12 +9,13 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DonorResponse {
-    private Long id;
-    private Integer donorId;
-    private String donorName;
+public class DonorListResponse {
+    private Long Id;
     private Long campaignId;
     private String campaignTitle;
+    private Integer donorId;
+    private String donorName;
     private Double amount;
+    private boolean anonymous;
     private LocalDateTime donatedAt;
 }

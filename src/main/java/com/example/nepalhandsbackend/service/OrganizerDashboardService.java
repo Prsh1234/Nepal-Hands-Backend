@@ -2,8 +2,10 @@ package com.example.nepalhandsbackend.service;
 
 import com.example.nepalhandsbackend.dto.response.*;
 import com.example.nepalhandsbackend.model.Campaign;
+import com.example.nepalhandsbackend.model.CampaignUpdate;
 import com.example.nepalhandsbackend.model.VolunteerApplication;
 import com.example.nepalhandsbackend.model.VolunteerOpportunity;
+import com.example.nepalhandsbackend.repository.CampaignPaymentRepository;
 import com.example.nepalhandsbackend.repository.CampaignRepository;
 import com.example.nepalhandsbackend.repository.VolunteerApplicationRepository;
 import com.example.nepalhandsbackend.repository.VolunteerOpportunityRepository;
@@ -27,24 +29,47 @@ public class OrganizerDashboardService {
     private final CampaignRepository campaignRepository;
     private final VolunteerOpportunityRepository volunteerOpportunityRepository;
     private final VolunteerApplicationRepository volunteerApplicationRepository;
+    private final CampaignPaymentRepository campaignPaymentRepository;
+    public DashboardStatsResponse getDashboardStats(Long organizerId) {
 
-    public List<OrganizerCampaignResponse> getMyCampaigns(Integer userId) {
+        return DashboardStatsResponse.builder()
+                .totalRaised(
+                        campaignPaymentRepository.getTotalRaised(organizerId)
+                )
+                .totalDonors(
+                        campaignPaymentRepository.countUniqueDonors(organizerId)
+                )
+                .totalApplicants(
+                        volunteerApplicationRepository.getTotalApplicants(organizerId)
+                )
+                .build();
+    }
+    public Page<OrganizerCampaignResponse> getMyCampaigns(
+            Integer userId,
+            int page,
+            int size,
+            String direction
+    ) {
+        Sort sort = direction.equalsIgnoreCase("asc")
+                ? Sort.by("createdAt").ascending()
+                : Sort.by("createdAt").descending();
 
-        List<Campaign> campaigns = campaignRepository.findByUserId(userId);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        return campaigns.stream()
-                .map(c -> OrganizerCampaignResponse.builder()
+        Page<Campaign> campaigns;
+        campaigns = campaignRepository.findByUserId(userId, pageable);
+
+        return campaigns.map(c -> OrganizerCampaignResponse.builder()
                         .id(c.getId())
                         .title(c.getTitle())
                         .category(c.getCategory())
                         .status(mapVolunteerStatus(c.getStatus()))
                         .goal(c.getGoal())
-                        .raised(0L) // replace with donations sum
-                        .donors(0)  // replace with donor count
+                        .raised(campaignPaymentRepository.getTotalRaisedByCampaignId(c.getId()))
+                        .donors(campaignPaymentRepository.countUniqueDonorsByCampaign(c.getId(), (long)c.getUser().getId()))  // replace with donor count
                         .daysLeft(getDaysLeft(c))
                         .createdDate(c.getCreatedAt())
-                        .build())
-                .toList();
+                        .build());
     }
 
 
@@ -100,37 +125,13 @@ public class OrganizerDashboardService {
                 Sort.by(Sort.Direction.DESC, "appliedAt")
         );
 
-        Page<VolunteerApplication> applications;
-
-        if (opportunityId != null && status != null) {
-            applications = volunteerApplicationRepository
-                    .findByOpportunityIdAndOpportunityUserIdAndStatus(
-                            opportunityId,
-                            organizerId,
-                            status,
-                            pageable
-                    );
-        } else if (opportunityId != null) {
-            applications = volunteerApplicationRepository
-                    .findByOpportunityIdAndOpportunityUserId(
-                            opportunityId,
-                            organizerId,
-                            pageable
-                    );
-        } else if (status != null) {
-            applications = volunteerApplicationRepository
-                    .findByOpportunityUserIdAndStatus(
-                            organizerId,
-                            status,
-                            pageable
-                    );
-        } else {
-            applications = volunteerApplicationRepository
-                    .findByOpportunityUserId(
-                            organizerId,
-                            pageable
-                    );
-        }
+        Page<VolunteerApplication> applications =
+                volunteerApplicationRepository.findApplications(
+                        organizerId,
+                        opportunityId,
+                        status,
+                        pageable
+                );
 
         return applications.map(v ->
                 VolunteerApplyResponse.builder()
@@ -145,6 +146,7 @@ public class OrganizerDashboardService {
                         .status(v.getStatus())
                         .appliedAt(v.getAppliedAt())
                         .updatedAt(v.getUpdatedAt())
+                        .skills(v.getVolunteer().getSkills())
                         .build()
         );
     }

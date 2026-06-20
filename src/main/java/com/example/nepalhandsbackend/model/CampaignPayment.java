@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class CampaignPayment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(unique = true, nullable = true)
     private String transaction_code;

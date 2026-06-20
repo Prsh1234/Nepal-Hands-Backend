@@ -31,8 +31,7 @@ public class CampaignController {
     @Autowired
     private CampaignService campaignService;
     private final JwtUtil jwtUtil;
-    @Autowired
-    private CampaignExpensesService campaignExpensesService;
+
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Campaign> createCampaign(
