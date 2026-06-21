@@ -3,19 +3,19 @@ package com.example.nepalhandsbackend.service;
 
 import com.example.nepalhandsbackend.dto.request.VolunteerOpportunityRequest;
 import com.example.nepalhandsbackend.dto.response.*;
-import com.example.nepalhandsbackend.model.User;
-import com.example.nepalhandsbackend.model.VolunteerOpportunity;
-import com.example.nepalhandsbackend.model.VolunteerOpportunityVerification;
-import com.example.nepalhandsbackend.model.VolunteerVerificationDocument;
+import com.example.nepalhandsbackend.model.*;
 import com.example.nepalhandsbackend.repository.UserRepository;
+import com.example.nepalhandsbackend.repository.VolunteerApplicationRepository;
 import com.example.nepalhandsbackend.repository.VolunteerOpportunityRepository;
-import com.example.nepalhandsbackend.states.OpportunityStatus;
+import com.example.nepalhandsbackend.states.*;
 import com.example.nepalhandsbackend.utils.FileTextUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +34,8 @@ public class VolunteerOpportunityService {
     private final VolunteerOpportunityRepository repository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private VolunteerApplicationRepository volunteerApplicationRepository;
     public Long create(
             VolunteerOpportunityRequest req,
             Integer userId
@@ -123,7 +125,29 @@ public class VolunteerOpportunityService {
         applyRequest(req, entity);
         return entity;
     }
+    public List<VolunteerTeamResponse> getVolunteerTeam(
+            Long opportunityId
+    ) {
 
+
+        List<VolunteerApplication> applications =
+                volunteerApplicationRepository.findByOpportunityIdAndStatusOrderByUpdatedAtDesc(
+                        opportunityId,
+                        ApplicationStatus.APPROVED
+                );
+
+        return applications
+                .stream()
+                .map(v ->
+                        VolunteerTeamResponse.builder()
+                                .id(v.getId())
+                                .volunteerId(v.getVolunteer().getId())
+                                .opportunityId(v.getOpportunity().getId())
+                                .fullName(v.getFullName())
+                                .joinedAt(v.getUpdatedAt())
+                                .build())
+                .toList();
+    }
     private void applyRequest(VolunteerOpportunityRequest req, VolunteerOpportunity entity) throws IOException {
 
         entity.setTitle(req.getTitle());
@@ -147,6 +171,7 @@ public class VolunteerOpportunityService {
         entity.setContactName(req.getContactName());
         entity.setContactEmail(req.getContactEmail());
         entity.setContactPhone(req.getContactPhone());
+        entity.setOrganizer(req.getOrganizer());
         VolunteerOpportunityVerification verification =
                 entity.getVerification();
 
@@ -276,6 +301,8 @@ public class VolunteerOpportunityService {
                 .contactName(e.getContactName())
                 .contactEmail(e.getContactEmail())
                 .contactPhone(e.getContactPhone())
+                .filledSpots(repository.countApproved(e.getId()))
+                .totalSpots(e.getVolunteerSpots())
                 .status(e.getStatus())
                 .createdAt(e.getCreatedAt())
                 .updatedAt(e.getUpdatedAt())
@@ -299,10 +326,58 @@ public class VolunteerOpportunityService {
                                                 .build()
                                 ).toList()
                 )
+                .team(getVolunteerTeam(e.getId()))
                 .build();
     }
 
+    public Page<VolunteerCardDTO> getOpportunities(
+            String search,
+            VolunteerCategory category,
+            String sort,
+            int page,
+            int size
+    ) {
 
+        Sort sorting;
+
+        switch (sort) {
+            case "newest":
+                sorting = Sort.by("createdAt").descending();
+                break;
+
+            case "starting-soon":
+                sorting = Sort.by("startDate").ascending();
+                break;
+
+            default:
+                sorting = Sort.by("createdAt").descending();
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sorting);
+
+        return repository
+                .findOpportunities(search, category, pageable)
+                .map(v -> VolunteerCardDTO.builder()
+                        .description(v.getDescription())
+                        .longDescription(v.getLongDescription())
+                        .id(v.getId())
+                        .organizer(v.getOrganizer())
+                        .category(v.getCategory())
+                        .title(v.getTitle())
+                        .startDate(v.getStartDate())
+                        .endDate(v.getEndDate())
+                        .totalSpots(v.getVolunteerSpots())
+                        .dailyHours(v.getDailyHours())
+                        .location(v.getLocation())
+                        .requiredSkills(v.getRequiredSkills())
+                        .filledSpots(repository.countApproved(v.getId()))
+                        .postedAt(v.getCreatedAt())
+                        .commitmentType(v.getCommitmentType())
+
+
+                        .postedAt(v.getCreatedAt())
+                        .build());
+    }
 
 
 }

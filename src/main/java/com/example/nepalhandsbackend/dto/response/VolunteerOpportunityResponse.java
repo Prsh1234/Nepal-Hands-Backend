@@ -2,6 +2,7 @@ package com.example.nepalhandsbackend.dto.response;
 
 import com.example.nepalhandsbackend.model.VolunteerOpportunityUpdate;
 import com.example.nepalhandsbackend.states.OpportunityStatus;
+import com.example.nepalhandsbackend.states.VolunteerCategory;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,11 +18,12 @@ public class VolunteerOpportunityResponse {
     private Integer postedById;
     private String postedByName;
     private String title;
-    private String category;
+    private VolunteerCategory category;
     private String location;
     private String description;
     private String longDescription;
-
+    private Integer totalSpots;
+    private Long filledSpots;
     private List<String> requiredSkills;
     private Integer volunteerSpots;
     private Integer minimumAge;
@@ -52,4 +54,5 @@ public class VolunteerOpportunityResponse {
 
     private VolunteerOpportunityVerificationResponse verification;
     private List<VolunteerOpportunityUpdateResponse> updates;
+    private List<VolunteerTeamResponse> team;
 }

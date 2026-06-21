@@ -1,5 +1,6 @@
 package com.example.nepalhandsbackend.dto.response;
 
+import com.example.nepalhandsbackend.states.VolunteerCategory;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,7 +12,7 @@ public class OrganizerVolunteerResponse {
 
     private Long id;
     private String title;
-    private String category;
+    private VolunteerCategory category;
     private String status;
 
     private Integer capacity;

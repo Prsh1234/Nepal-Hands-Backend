@@ -1,6 +1,7 @@
 package com.example.nepalhandsbackend.model;
 
 import com.example.nepalhandsbackend.states.OpportunityStatus;
+import com.example.nepalhandsbackend.states.VolunteerCategory;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -31,9 +32,10 @@ public class VolunteerOpportunity {
     @Column(nullable = false, length = 100)
     private String title;
 
-    @NotBlank
+    @NotNull
     @Column(nullable = false)
-    private String category; // teaching | healthcare | construction | environment | water | community
+    @Enumerated(EnumType.STRING)
+    private VolunteerCategory category; // teaching | healthcare | construction | environment | water | community
 
     @NotBlank
     @Column(nullable = false)
@@ -49,7 +51,10 @@ public class VolunteerOpportunity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String longDescription;
 
-
+    @NotBlank
+    @Size(min = 40)
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String organizer;
     // ── Step 1: Requirements ─────────────────────────────────────────────────
 
     @ElementCollection

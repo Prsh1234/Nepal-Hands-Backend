@@ -1,6 +1,7 @@
 package com.example.nepalhandsbackend.controller.VolunteersAndDonors;
 
 
+import com.example.nepalhandsbackend.dto.response.CampaignCardDTO;
 import com.example.nepalhandsbackend.dto.response.CampaignResponse;
 import com.example.nepalhandsbackend.dto.response.CampaignTransparencyExpensesResponse;
 import com.example.nepalhandsbackend.dto.response.CampaignTransparencyImpactResponse;
@@ -11,9 +12,11 @@ import com.example.nepalhandsbackend.repository.CampaignTransparencyImpactReposi
 import com.example.nepalhandsbackend.service.CampaignExpensesService;
 import com.example.nepalhandsbackend.service.CampaignImpactService;
 import com.example.nepalhandsbackend.service.CampaignService;
+import com.example.nepalhandsbackend.states.CampaignCategory;
 import com.example.nepalhandsbackend.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +36,34 @@ public class DonorController {
     @Autowired
     private CampaignImpactService campaignImpactService;
 
+    @GetMapping
+    public ResponseEntity<Page<CampaignCardDTO>> getCampaigns(
 
+            @RequestParam(required = false) String search,
+
+            @RequestParam(required = false)
+            CampaignCategory category,
+
+            @RequestParam(defaultValue = "ending-soon")
+            String sort,
+
+            @RequestParam(defaultValue = "0")
+            int page,
+
+            @RequestParam(defaultValue = "9")
+            int size
+    ) {
+
+        return ResponseEntity.ok(
+                campaignService.getCampaigns(
+                        search,
+                        category,
+                        sort,
+                        page,
+                        size
+                )
+        );
+    }
     @GetMapping("/{id}")
     public ResponseEntity<CampaignResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(campaignService.getById(id));

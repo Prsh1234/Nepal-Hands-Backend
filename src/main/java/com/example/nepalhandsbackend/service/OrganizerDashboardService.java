@@ -150,6 +150,7 @@ public class OrganizerDashboardService {
                         .build()
         );
     }
+
     public void updateApplicationStatus(
             Long applicationId,
             ApplicationStatus status) {

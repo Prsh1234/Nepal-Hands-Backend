@@ -1,6 +1,7 @@
 package com.example.nepalhandsbackend.dto.request;
 
 
+import com.example.nepalhandsbackend.states.CampaignCategory;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,8 +16,8 @@ public class CampaignRequest {
     @Size(max = 100, message = "Title must be 100 characters or fewer")
     private String title;
 
-    @NotBlank(message = "Category is required")
-    private String category;
+    @NotNull(message = "Category is required")
+    private CampaignCategory category;
 
     @NotBlank(message = "Location is required")
     private String location;

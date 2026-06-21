@@ -1,5 +1,6 @@
 package com.example.nepalhandsbackend.model;
 
+import com.example.nepalhandsbackend.states.CampaignCategory;
 import com.example.nepalhandsbackend.states.CampaignStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -32,9 +33,10 @@ public class Campaign {
     @Column(nullable = false, length = 100)
     private String title;
 
-    @NotBlank
+    @NotNull
     @Column(nullable = false)
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private CampaignCategory category;
 
     @NotBlank
     @Column(nullable = false)

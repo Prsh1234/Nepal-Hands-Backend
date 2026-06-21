@@ -1,7 +1,10 @@
 package com.example.nepalhandsbackend.repository;
 
+import com.example.nepalhandsbackend.model.Campaign;
 import com.example.nepalhandsbackend.model.VolunteerOpportunity;
+import com.example.nepalhandsbackend.states.CampaignCategory;
 import com.example.nepalhandsbackend.states.OpportunityStatus;
+import com.example.nepalhandsbackend.states.VolunteerCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -46,4 +49,33 @@ public interface VolunteerOpportunityRepository extends JpaRepository<VolunteerO
     );
 
     List<VolunteerOpportunity> findByUserId(Integer userId);
+
+    @Query("""
+        SELECT c
+        FROM VolunteerOpportunity c
+        WHERE c.status = com.example.nepalhandsbackend.states.OpportunityStatus.ACTIVE
+        AND (
+            :search IS NULL OR
+            LOWER(c.title) LIKE LOWER(CONCAT('%', :search, '%')) OR
+            LOWER(c.description) LIKE LOWER(CONCAT('%', :search, '%')) OR
+            LOWER(c.organizer) LIKE LOWER(CONCAT('%', :search, '%')) OR 
+            LOWER(c.longDescription) LIKE LOWER(CONCAT('%', :search, '%')) 
+        )
+        AND (
+            :category IS NULL OR
+            c.category = :category
+        )
+    """)
+    Page<VolunteerOpportunity> findOpportunities(
+            @Param("search") String search,
+            @Param("category") VolunteerCategory category,
+            Pageable pageable
+    );
+    @Query("""
+SELECT COUNT(a)
+FROM VolunteerApplication a
+WHERE a.opportunity.id = :opportunityId
+AND a.status = 'APPROVED'
+""")
+    long countApproved(Long opportunityId);
 }

@@ -1,5 +1,6 @@
 package com.example.nepalhandsbackend.dto.response;
 
+import com.example.nepalhandsbackend.states.CampaignCategory;
 import com.example.nepalhandsbackend.states.CampaignStatus;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,7 @@ public class CampaignResponse {
     private Integer postedById;
     private String postedByName;
     private String title;
-    private String category;
+    private CampaignCategory category;
     private String location;
     private String description;
     private String longDescription;

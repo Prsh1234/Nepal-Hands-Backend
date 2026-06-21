@@ -6,6 +6,7 @@ import com.example.nepalhandsbackend.model.*;
 import com.example.nepalhandsbackend.repository.CampaignPaymentRepository;
 import com.example.nepalhandsbackend.repository.CampaignRepository;
 import com.example.nepalhandsbackend.repository.UserRepository;
+import com.example.nepalhandsbackend.states.CampaignCategory;
 import com.example.nepalhandsbackend.states.CampaignStatus;
 import com.example.nepalhandsbackend.states.PaymentStatus;
 import com.example.nepalhandsbackend.utils.FileTextUtils;
@@ -13,12 +14,16 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -143,7 +148,47 @@ public class CampaignService {
 
         return toResponse(entity);
     }
+    public Page<CampaignCardDTO> getCampaigns(
+            String search,
+            CampaignCategory category,
+            String sort,
+            int page,
+            int size
+    ) {
 
+        Sort sorting;
+
+        switch (sort) {
+            case "newest":
+                sorting = Sort.by("createdAt").descending();
+                break;
+
+            case "ending-soon":
+                sorting = Sort.by("endDate").ascending();
+                break;
+
+            default:
+                sorting = Sort.by("createdAt").descending();
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sorting);
+
+        return campaignRepository
+                .findCampaigns(search, category, pageable)
+                .map(c -> CampaignCardDTO.builder()
+                        .description(c.getDescription())
+                        .id(c.getId())
+                        .organizer(c.getOrganizer())
+                        .category(c.getCategory())
+                        .title(c.getTitle())
+                        .donors(campaignPaymentRepository.countByCampaignIdAndStatus(c.getId(),PaymentStatus.SUCCESS))
+                        .raised(campaignPaymentRepository.getTotalRaisedByCampaignId(c.getId()))
+                        .goal(c.getGoal())
+                        .daysLeft(getDaysLeft(c))
+                        .progress(getProgress(c))
+                        .postedAt(c.getCreatedAt())
+                        .build());
+    }
 
     private CampaignVerificationResponse mapVerification(
             CampaignVerification c
@@ -226,5 +271,29 @@ public class CampaignService {
                 )
                 .build();
     }
+    private Long getDaysLeft(Campaign campaign) {
+        if (campaign.getStatus() != CampaignStatus.ACTIVE) {
+            return 0L;
+        }
 
+        long days = ChronoUnit.DAYS.between(
+                LocalDate.now(),
+                campaign.getEndDate()
+        );
+
+        return Math.max(days, 0);
+    }
+    private double getProgress(Campaign campaign) {
+        if (campaign.getStatus() != CampaignStatus.ACTIVE) {
+            return 0L;
+        }
+        if(campaign.getGoal()>0){
+            double progress = Math.min(
+                    ((campaignPaymentRepository.getTotalRaisedByCampaignId(campaign.getId()))/campaign.getGoal())*100,100);
+            return progress;
+        }else {
+            return 0;
+        }
+    }
 }
+

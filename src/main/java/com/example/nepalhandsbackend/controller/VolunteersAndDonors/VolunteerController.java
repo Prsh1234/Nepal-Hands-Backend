@@ -1,14 +1,19 @@
 package com.example.nepalhandsbackend.controller.VolunteersAndDonors;
 
 import com.example.nepalhandsbackend.dto.request.VolunteerApplyRequest;
+import com.example.nepalhandsbackend.dto.response.CampaignCardDTO;
+import com.example.nepalhandsbackend.dto.response.VolunteerCardDTO;
 import com.example.nepalhandsbackend.dto.response.VolunteerOpportunityResponse;
 import com.example.nepalhandsbackend.repository.UserRepository;
 import com.example.nepalhandsbackend.service.VolunteerOpportunityService;
 import com.example.nepalhandsbackend.service.VolunteersAndDonors.VolunteersService;
 import com.example.nepalhandsbackend.states.ApplicationStatus;
+import com.example.nepalhandsbackend.states.CampaignCategory;
+import com.example.nepalhandsbackend.states.VolunteerCategory;
 import com.example.nepalhandsbackend.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,12 +29,38 @@ public class VolunteerController {
     private final VolunteersService service;
     private final JwtUtil jwtUtil;
 
-    /** GET /api/organizer/volunteer-opportunities/{id} */
     @GetMapping("/{id}")
     public ResponseEntity<VolunteerOpportunityResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(volunteerOpportunityService.getById(id));
     }
+    @GetMapping
+    public ResponseEntity<Page<VolunteerCardDTO>> getCampaigns(
 
+            @RequestParam(required = false) String search,
+
+            @RequestParam(required = false)
+            VolunteerCategory category,
+
+            @RequestParam(defaultValue = "starting-soon")
+            String sort,
+
+            @RequestParam(defaultValue = "0")
+            int page,
+
+            @RequestParam(defaultValue = "9")
+            int size
+    ) {
+
+        return ResponseEntity.ok(
+                volunteerOpportunityService.getOpportunities(
+                        search,
+                        category,
+                        sort,
+                        page,
+                        size
+                )
+        );
+    }
     @GetMapping("/applicationStatus/{id}")
     public ResponseEntity<ApplicationStatus> getVolunteerApplicationStatus(
             @PathVariable Long id,

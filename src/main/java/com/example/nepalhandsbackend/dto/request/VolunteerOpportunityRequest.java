@@ -1,5 +1,6 @@
 package com.example.nepalhandsbackend.dto.request;
 
+import com.example.nepalhandsbackend.states.VolunteerCategory;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,16 +16,17 @@ public class VolunteerOpportunityRequest {
     @Size(max = 100, message = "Title must be 100 characters or fewer")
     private String title;
 
-    @NotBlank(message = "Category is required")
+    @NotNull(message = "Category is required")
     @Pattern(
             regexp = "teaching|healthcare|construction|environment|water|community",
             message = "Invalid category"
     )
-    private String category;
+    private VolunteerCategory category;
 
     @NotBlank(message = "Location is required")
     private String location;
-
+    @NotBlank(message = "organizer is required")
+    private String organizer;
     @NotBlank(message = "Description is required")
     @Size(min = 20, message = "Description must be at least 20 characters")
     private String description;
