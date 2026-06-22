@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 public class VolunteerTeamResponse {
     private Long id;
-    private int volunteerId;
+    private int userId;
     private String fullName;
     private Long opportunityId;
     private LocalDateTime joinedAt;

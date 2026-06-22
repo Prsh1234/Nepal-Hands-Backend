@@ -72,6 +72,22 @@ public interface VolunteerOpportunityRepository extends JpaRepository<VolunteerO
             Pageable pageable
     );
     @Query("""
+    SELECT v
+    FROM VolunteerOpportunity v
+    LEFT JOIN VolunteerApplication a
+        ON a.opportunity.id = v.id
+        AND a.status = com.example.nepalhandsbackend.states.ApplicationStatus.APPROVED
+    WHERE (:search IS NULL OR LOWER(v.title) LIKE LOWER(CONCAT('%', :search, '%')))
+      AND (:category IS NULL OR v.category = :category)
+    GROUP BY v
+    ORDER BY (v.volunteerSpots - COUNT(a)) DESC
+""")
+    Page<VolunteerOpportunity> findOpportunitiesBySpotsLeft(
+            @Param("search") String search,
+            @Param("category") VolunteerCategory category,
+            Pageable pageable
+    );
+    @Query("""
 SELECT COUNT(a)
 FROM VolunteerApplication a
 WHERE a.opportunity.id = :opportunityId

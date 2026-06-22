@@ -2,6 +2,7 @@ package com.example.nepalhandsbackend.controller.VolunteersAndDonors;
 
 import com.example.nepalhandsbackend.dto.request.VolunteerApplyRequest;
 import com.example.nepalhandsbackend.dto.response.CampaignCardDTO;
+import com.example.nepalhandsbackend.dto.response.ChatOpportunityDetailsResponse;
 import com.example.nepalhandsbackend.dto.response.VolunteerCardDTO;
 import com.example.nepalhandsbackend.dto.response.VolunteerOpportunityResponse;
 import com.example.nepalhandsbackend.repository.UserRepository;
@@ -33,8 +34,13 @@ public class VolunteerController {
     public ResponseEntity<VolunteerOpportunityResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(volunteerOpportunityService.getById(id));
     }
+
+    @GetMapping("/chat/details/{id}")
+    public ResponseEntity<ChatOpportunityDetailsResponse> getChatOpportunityDetails(@PathVariable Long id) {
+        return ResponseEntity.ok(volunteerOpportunityService.getChatOpportunityDetails(id));
+    }
     @GetMapping
-    public ResponseEntity<Page<VolunteerCardDTO>> getCampaigns(
+    public ResponseEntity<Page<VolunteerCardDTO>> getOpportunities(
 
             @RequestParam(required = false) String search,
 

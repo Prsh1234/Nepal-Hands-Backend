@@ -5,6 +5,9 @@ import com.example.nepalhandsbackend.states.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -18,7 +21,7 @@ import java.util.stream.Collectors;
 public class JwtUtil {
 
     private final String SECRET_KEY = "my_super_secret_key_that_is_at_least_32_chars!";
-    private final long ACCESS_TOKEN_EXP  = 1000L * 60 * 60;           // 1 hour
+    private final long ACCESS_TOKEN_EXP  = 1000L * 60 * 60*24;           // 1 hour
     private final long REFRESH_TOKEN_EXP = 1000L * 60 * 60 * 24 * 30; // 30 days
 
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
@@ -92,5 +95,26 @@ public class JwtUtil {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+    public Authentication getAuthentication(String token) {
+
+        String email = extractEmail(token);
+
+        Integer userId = userRepository.findByEmail(email)
+                .orElseThrow()
+                .getId();
+        if (!validateToken(token)) {
+            return null;
+        }
+        List<SimpleGrantedAuthority> authorities =
+                extractRoles(token).stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+
+        return new UsernamePasswordAuthenticationToken(
+                userId.toString(),   // ✅ IMPORTANT CHANGE
+                null,
+                authorities
+        );
     }
 }

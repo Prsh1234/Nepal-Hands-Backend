@@ -45,6 +45,7 @@ public class AuthController {
         }
 
         User user = new User();
+
         user.setEmail(req.getEmail());
         user.setFirstName(req.getFirstName());
         user.setLastName(req.getLastName());

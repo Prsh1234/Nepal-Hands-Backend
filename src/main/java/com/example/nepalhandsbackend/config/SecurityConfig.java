@@ -43,12 +43,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/oauth2/**", "/api/oauth2/**", "/login/oauth2/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")           // ← was hasRole
+                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/organizer/**").hasAnyAuthority("ROLE_ORGANIZER", "ROLE_ADMIN")
                         .requestMatchers("/api/user/**").authenticated()
                         .requestMatchers("/api/esewa/**").permitAll()
                         .requestMatchers("/api/payment/**").authenticated()
-
+                        .requestMatchers("/ws/**").permitAll()
 
                         .anyRequest().authenticated()
                 )

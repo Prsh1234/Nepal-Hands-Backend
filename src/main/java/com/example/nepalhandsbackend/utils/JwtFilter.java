@@ -39,7 +39,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-
             if (jwtUtil.validateToken(token) && "access".equals(jwtUtil.extractType(token))) {
 
                 String email = jwtUtil.extractEmail(token);
@@ -61,6 +60,7 @@ public class JwtFilter extends OncePerRequestFilter {
                                     null,
                                     authorities
                             );
+
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
                     System.out.println("=== WARNING: roles list is null, no authentication set");
@@ -69,7 +69,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 System.out.println("=== WARNING: Token invalid or not access type — no authentication set");
             }
         } else {
-            System.out.println("=== WARNING: No Bearer token found in request");
+            System.out.println("=== WARNING: No Bearer token found in requests");
         }
 
         filterChain.doFilter(request, response);

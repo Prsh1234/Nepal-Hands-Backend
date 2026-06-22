@@ -57,6 +57,24 @@ public class VolunteerOpportunityService {
     }
 
     @Transactional(readOnly = true)
+    public ChatOpportunityDetailsResponse getChatOpportunityDetails(Long id) {
+        VolunteerOpportunity opportunity = findOrThrow(id);
+
+        return ChatOpportunityDetailsResponse.builder()
+                .id(opportunity.getId())
+                .organizerId(opportunity.getUser().getId())
+                .organizer(opportunity.getOrganizer())
+                .title(opportunity.getTitle())
+                .location(opportunity.getLocation())
+                .description(opportunity.getDescription())
+                .startDate(opportunity.getStartDate())
+                .endDate(opportunity.getEndDate())
+                .filledSpots(repository.countApproved(opportunity.getId()))
+                .team(getVolunteerTeam(opportunity.getId()))
+                .build();
+    }
+
+    @Transactional(readOnly = true)
     public PageResponse<VolunteerOpportunityResponse> search(
             String category, String location, Pageable pageable) {
 
@@ -141,7 +159,7 @@ public class VolunteerOpportunityService {
                 .map(v ->
                         VolunteerTeamResponse.builder()
                                 .id(v.getId())
-                                .volunteerId(v.getVolunteer().getId())
+                                .userId(v.getVolunteer().getId())
                                 .opportunityId(v.getOpportunity().getId())
                                 .fullName(v.getFullName())
                                 .joinedAt(v.getUpdatedAt())
@@ -302,7 +320,6 @@ public class VolunteerOpportunityService {
                 .contactEmail(e.getContactEmail())
                 .contactPhone(e.getContactPhone())
                 .filledSpots(repository.countApproved(e.getId()))
-                .totalSpots(e.getVolunteerSpots())
                 .status(e.getStatus())
                 .createdAt(e.getCreatedAt())
                 .updatedAt(e.getUpdatedAt())
@@ -338,46 +355,58 @@ public class VolunteerOpportunityService {
             int size
     ) {
 
-        Sort sorting;
+        Page<VolunteerOpportunity> opportunity;
 
-        switch (sort) {
-            case "newest":
-                sorting = Sort.by("createdAt").descending();
-                break;
+        if ("spots-left".equals(sort)) {
 
-            case "starting-soon":
-                sorting = Sort.by("startDate").ascending();
-                break;
+            Pageable pageable = PageRequest.of(page, size);
 
-            default:
-                sorting = Sort.by("createdAt").descending();
+            opportunity = repository.findOpportunitiesBySpotsLeft(
+                    search,
+                    category,
+                    pageable
+            );
+
+        } else {
+
+            Sort sorting;
+
+            switch (sort) {
+                case "starting-soon":
+                    sorting = Sort.by("startDate").ascending();
+                    break;
+
+                case "newest":
+                default:
+                    sorting = Sort.by("createdAt").descending();
+            }
+
+            Pageable pageable = PageRequest.of(page, size, sorting);
+
+            opportunity = repository.findOpportunities(
+                    search,
+                    category,
+                    pageable
+            );
         }
 
-        Pageable pageable = PageRequest.of(page, size, sorting);
-
-        return repository
-                .findOpportunities(search, category, pageable)
-                .map(v -> VolunteerCardDTO.builder()
-                        .description(v.getDescription())
-                        .longDescription(v.getLongDescription())
-                        .id(v.getId())
-                        .organizer(v.getOrganizer())
-                        .category(v.getCategory())
-                        .title(v.getTitle())
-                        .startDate(v.getStartDate())
-                        .endDate(v.getEndDate())
-                        .totalSpots(v.getVolunteerSpots())
-                        .dailyHours(v.getDailyHours())
-                        .location(v.getLocation())
-                        .requiredSkills(v.getRequiredSkills())
-                        .filledSpots(repository.countApproved(v.getId()))
-                        .postedAt(v.getCreatedAt())
-                        .commitmentType(v.getCommitmentType())
-
-
-                        .postedAt(v.getCreatedAt())
-                        .build());
+        return opportunity.map(v -> VolunteerCardDTO.builder()
+                .description(v.getDescription())
+                .longDescription(v.getLongDescription())
+                .id(v.getId())
+                .organizer(v.getOrganizer())
+                .category(v.getCategory())
+                .title(v.getTitle())
+                .startDate(v.getStartDate())
+                .endDate(v.getEndDate())
+                .totalSpots(v.getVolunteerSpots())
+                .dailyHours(v.getDailyHours())
+                .location(v.getLocation())
+                .requiredSkills(v.getRequiredSkills())
+                .filledSpots(repository.countApproved(v.getId()))
+                .postedAt(v.getCreatedAt())
+                .commitmentType(v.getCommitmentType())
+                .build());
     }
-
 
 }
