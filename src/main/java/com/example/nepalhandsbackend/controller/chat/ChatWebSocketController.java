@@ -9,6 +9,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.io.IOException;
+
 @Controller
 @RequiredArgsConstructor
 public class ChatWebSocketController {
@@ -32,7 +34,7 @@ public class ChatWebSocketController {
 
 
     @MessageMapping("/group.send")
-    public void sendToGroup(VolunteerChatRequest message) {
+    public void sendToGroup(VolunteerChatRequest message) throws IOException {
         VolunteerChatResponse saved = chatService.saveChat(message);
 
         messagingTemplate.convertAndSend(

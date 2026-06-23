@@ -2,6 +2,7 @@ package com.example.nepalhandsbackend.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 
@@ -29,8 +30,16 @@ public class VolunteerChat {
 
     private String senderName;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT",nullable = true)
     private String content;
 
+    @Lob
+    @Column(nullable = true, columnDefinition = "LONGBLOB")
+    private byte[] file;
+
+    @Column(nullable = true)
+    private String fileType;
+    @Column(nullable = true)
+    private String fileName;
     private Instant sentAt;
 }

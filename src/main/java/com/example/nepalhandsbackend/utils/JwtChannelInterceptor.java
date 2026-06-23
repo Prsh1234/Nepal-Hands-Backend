@@ -26,6 +26,7 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
         System.out.println("STOMP COMMAND: " + accessor.getCommand());
 
+
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
 
             String authHeader = accessor.getFirstNativeHeader("Authorization");
